@@ -5,7 +5,6 @@ import 'package:path_provider/path_provider.dart';
 import 'package:note_keeper/models/note.dart';
 
 class DatabaseHelper {
-
   // Singleton DatabaseHelper
   static DatabaseHelper _databaseHelper;
 
@@ -42,8 +41,8 @@ class DatabaseHelper {
     String path = directory.path + 'notes.db';
 
     // Open/create the database at a given path
-    var notesDatabase = await openDatabase(path, version: 1, onCreate:
-    _createDb);
+    var notesDatabase =
+        await openDatabase(path, version: 1, onCreate: _createDb);
     return notesDatabase;
   }
 
@@ -74,8 +73,10 @@ class DatabaseHelper {
   // Update Operation: Update a Note object and save it to database
   Future<int> updateNote(Note note) async {
     var db = await this.database;
-    var result = await db.update(noteTable, note.toMap(), where: '$colId = '
-        '?', whereArgs: [note.id]);
+    var result = await db.update(noteTable, note.toMap(),
+        where: '$colId = '
+            '?',
+        whereArgs: [note.id]);
     return result;
   }
 
@@ -96,4 +97,21 @@ class DatabaseHelper {
     return result;
   }
 
+  // Get the 'Map List' List<Map> and convert it to 'Note List' List<Note>
+  Future<List<Note>> getNoteList() async {
+    // Get 'Map List' from database
+    var noteMapList = await getNoteMapList();
+
+    // Count the number of map entries in database table
+    int count = noteMapList.length;
+
+    List<Note> noteList = List<Note>();
+
+    // For loop to create a 'Note List' from a 'Map List'
+    for (int i = 0; i < count; i++) {
+      noteList.add(Note.fromMapObject(noteMapList[i]));
+    }
+
+    return noteList;
+  }
 }
